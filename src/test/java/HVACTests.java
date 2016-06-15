@@ -2,8 +2,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by lucas.schwarz on 6/14/16.
@@ -15,7 +13,6 @@ public class HVACTests {
 	private Integer almostFreezing = 65;
 	private Integer almostMelting = 75;
 	private Integer cozy = 70;
-	private List<Integer> goldilocks = Arrays.asList(65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75);
 
 	@Test
 	public void cantUseFanImmediatelyAfterHeat() {
@@ -58,7 +55,8 @@ public class HVACTests {
 		HVAC hvac = new HVACImpl(tooDamnCold);
 		EnvironmentController environmentController = new EnvironmentController(hvac);
 		environmentController.tick();
-		Assert.assertTrue(environmentController.getHeatEnabled() && environmentController.getFanEnabled());
+		boolean expectedHvacStates = environmentController.getHeatEnabled() && environmentController.getFanEnabled()&& !environmentController.getColdEnabled();
+		Assert.assertTrue(expectedHvacStates);
 	}
 
 	@Test
@@ -66,7 +64,8 @@ public class HVACTests {
 		HVAC hvac = new HVACImpl(tooDamnHot);
 		EnvironmentController environmentController = new EnvironmentController(hvac);
 		environmentController.tick();
-		Assert.assertTrue(environmentController.getColdEnabled() && environmentController.getFanEnabled());
+		boolean expectedHvacStates = !environmentController.getHeatEnabled() && environmentController.getFanEnabled() && environmentController.getColdEnabled();
+		Assert.assertTrue(expectedHvacStates);
 	}
 
 	@Test
