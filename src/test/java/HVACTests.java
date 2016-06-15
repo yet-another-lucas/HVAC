@@ -13,12 +13,15 @@ public class HVACTests {
 	private Integer almostFreezing = 65;
 	private Integer almostMelting = 75;
 	private Integer cozy = 70;
+	private Integer testRefractoryPeriod = 1;
+	//the one we aren't testing is different so if controller gets confused we detect it
+	private Integer testRefractoryPeriodOpposite = testRefractoryPeriod + 1;
 
 	@Test
 	public void cantUseFanImmediatelyAfterHeat() {
 		HVAC coldHvac = new HVACImpl(tooDamnCold);
 		HVAC cozyHvac = new HVACImpl(cozy);
-		EnvironmentController environmentController = new EnvironmentController(coldHvac);
+		EnvironmentController environmentController = new EnvironmentController(coldHvac, testRefractoryPeriod, testRefractoryPeriodOpposite);
 		int heatCooldown = environmentController.getHeatRefractoryPeriod();
 		environmentController.tick(); //turns on fan and heat
 		replaceHvac(environmentController, cozyHvac);
@@ -36,7 +39,7 @@ public class HVACTests {
 	public void cantUseFanImmediatelyAfterCool() {
 		HVAC hotHvac = new HVACImpl(tooDamnHot);
 		HVAC cozyHvac = new HVACImpl(cozy);
-		EnvironmentController environmentController = new EnvironmentController(hotHvac);
+		EnvironmentController environmentController = new EnvironmentController(hotHvac, testRefractoryPeriodOpposite, testRefractoryPeriod);
 		int coldCooldown = environmentController.getColdRefractoryPeriod();
 		environmentController.tick(); //turn on fan and cool
 		replaceHvac(environmentController, cozyHvac);
@@ -74,7 +77,8 @@ public class HVACTests {
 		EnvironmentController environmentController = new EnvironmentController(hvac);
 		environmentController.tick();
 		boolean allThingsOff = !environmentController.getColdEnabled() && !environmentController.getFanEnabled() && !environmentController.getFanEnabled();
-		Assert.assertTrue(allThingsOff);	}
+		Assert.assertTrue(allThingsOff);
+	}
 
 	@Test
 	public void disableHvacWhenAlmostTooHot() {

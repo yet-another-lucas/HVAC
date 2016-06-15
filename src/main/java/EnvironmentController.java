@@ -3,6 +3,17 @@
  */
 public class EnvironmentController {
 
+
+	public EnvironmentController(HVAC hvac) {
+		this.hvac = hvac;
+	}
+
+	public EnvironmentController(HVAC hvac, Integer heatRefractoryPeriod, Integer coldRefractoryPeriod) {
+		this.hvac = hvac;
+		this.heatRefractoryPeriod = heatRefractoryPeriod;
+		this.coldRefractoryPeriod = coldRefractoryPeriod;
+	}
+
 	private HVAC hvac;
 	private Integer ticksUntilFanIsReady = 0;
 	private Integer heatRefractoryPeriod = 5;
@@ -69,9 +80,6 @@ public class EnvironmentController {
 		return this.fanEnabled;
 	}
 
-	public EnvironmentController(HVAC hvac) {
-		this.hvac = hvac;
-	}
 
 	public void tick() {
 		temp = hvac.temp();
