@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$USER_HOME$/Development/eighthlight/HVAC/HVAC.iml" filepath="$USER_HOME$/Development/eighthlight/HVAC/HVAC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HVAC.iml" filepath="$PROJECT_DIR$/HVAC.iml" />
     </modules>
   </component>
 </project>

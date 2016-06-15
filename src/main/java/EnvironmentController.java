@@ -4,6 +4,7 @@
 public class EnvironmentController {
 
 
+
 	public EnvironmentController(HVAC hvac) {
 		this.hvac = hvac;
 	}
@@ -18,6 +19,9 @@ public class EnvironmentController {
 	private Integer ticksUntilFanIsReady = 0;
 	private Integer heatRefractoryPeriod = 5;
 	private Integer coldRefractoryPeriod = 3;
+	private Integer upperBound = 75;
+	private Integer lowerBound = 65;
+
 
 	public Integer getHeatRefractoryPeriod() {
 		return heatRefractoryPeriod;
@@ -83,15 +87,15 @@ public class EnvironmentController {
 
 	public void tick() {
 		temp = hvac.temp();
-		if (temp < 65) {
+		if (temp < lowerBound) {
 			//chillax mode
 			turnItUp();
 		}
-		if (temp > 75) {
+		if (temp > upperBound) {
 			//inferno mode
 			turnItDown();
 		}
-		if (temp <= 75 && temp >= 65) {
+		if (temp <= upperBound && temp >= lowerBound) {
 			//goldilocks mode
 			shutItOff();
 		}
@@ -121,6 +125,30 @@ public class EnvironmentController {
 		hvac.heat(getHeatEnabled());
 		hvac.cool(getColdEnabled());
 		hvac.fan(getFanEnabled());
+	}
+
+	public void setUpperBound(Integer upperBound){
+		if(upperBound < lowerBound + 5){
+		}
+		else{
+		this.upperBound = upperBound;
+		}
+	}
+
+	public void setLowerBound(Integer lowerBound){
+		if(lowerBound > upperBound - 5){
+		}
+		else {
+		this.lowerBound = lowerBound;
+		}
+	}
+
+	public Integer getUpperBound(){
+		return this.upperBound;
+	}
+
+	public Integer getLowerBound(){
+		return this.lowerBound;
 	}
 
 }
