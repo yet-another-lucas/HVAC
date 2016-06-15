@@ -12,102 +12,99 @@ public class HVACTests {
 
 	private Integer tooDamnCold = 64;
 	private Integer tooDamnHot = 76;
+	private Integer almostFreezing = 65;
+	private Integer almostMelting = 75;
 	private Integer cozy = 70;
 	private List<Integer> goldilocks = Arrays.asList(65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75);
 
-
 	@Test
-	public void canInstantiateHVAC() {
-		HVAC hvac = new HVACImpl();
-		Assert.assertNotNull(hvac);
+	public void cantUseFanImmediatelyAfterHeat() {
+		HVAC coldHvac = new HVACImpl(tooDamnCold);
+		HVAC cozyHvac = new HVACImpl(cozy);
+		EnvironmentController environmentController = new EnvironmentController(coldHvac);
+		int heatCooldown = environmentController.getHeatRefractoryPeriod();
+		environmentController.tick(); //turns on fan and heat
+		replaceHvac(environmentController, cozyHvac);
+		environmentController.tick(); //turn off the fan
+		replaceHvac(environmentController, coldHvac);
+		for (int i = 0; i < heatCooldown; i++) {
+			environmentController.tick();
+			Assert.assertFalse(environmentController.getFanEnabled());
+		}
+		environmentController.tick();
+		Assert.assertTrue(environmentController.getFanEnabled());
 	}
 
-		@Test
-	public void canInstantiateEnvironmentController() {
-		HVAC hvac = new HVACImpl();
-		EnvironmentController environmentController = new EnvironmentController(hvac);
-		Assert.assertNotNull(environmentController);
+	@Test
+	public void cantUseFanImmediatelyAfterCool() {
+		HVAC hotHvac = new HVACImpl(tooDamnHot);
+		HVAC cozyHvac = new HVACImpl(cozy);
+		EnvironmentController environmentController = new EnvironmentController(hotHvac);
+		int coldCooldown = environmentController.getColdRefractoryPeriod();
+		environmentController.tick(); //turn on fan and cool
+		replaceHvac(environmentController, cozyHvac);
+		environmentController.tick(); //turn off the fan
+		replaceHvac(environmentController, hotHvac);
+		for (int i = 0; i < coldCooldown; i++) {
+			environmentController.tick();
+			Assert.assertFalse(environmentController.getFanEnabled());
+		}
+		environmentController.tick();
+		Assert.assertTrue(environmentController.getFanEnabled());
 	}
 
 	@Test
-	public void turnOnHeatAndFanWhenBelow65() {
-		HVAC hvac = new HVACImpl();
-		setTemp(hvac, tooDamnCold);
+	public void turnOnHeatAndFanWhenTooCold() {
+		HVAC hvac = new HVACImpl(tooDamnCold);
 		EnvironmentController environmentController = new EnvironmentController(hvac);
 		environmentController.tick();
-		boolean heatEnabled = getHeatEnabled(hvac);
-		boolean fanEnabled = getFanEnabled(hvac);
-		Assert.assertTrue(heatEnabled);
-		Assert.assertTrue(fanEnabled);
+		Assert.assertTrue(environmentController.getHeatEnabled() && environmentController.getFanEnabled());
 	}
 
 	@Test
-	public void turnOnCoolAndFanWhenAbove75() {
-		HVAC hvac = new HVACImpl();
-		setTemp(hvac, tooDamnHot);
+	public void turnOnCoolAndFanWhenTooHot() {
+		HVAC hvac = new HVACImpl(tooDamnHot);
 		EnvironmentController environmentController = new EnvironmentController(hvac);
 		environmentController.tick();
-		boolean coldEnabled = getHeatEnabled(hvac);
-		boolean fanEnabled = getFanEnabled(hvac);
-		Assert.assertTrue(coldEnabled && fanEnabled);
+		Assert.assertTrue(environmentController.getColdEnabled() && environmentController.getFanEnabled());
 	}
 
 	@Test
-	public void disableHvacWhenCozy() {
-		HVAC hvac = new HVACImpl();
-		setTemp(hvac, cozy);
+	public void disableHvacWhenAlmostTooCold() {
+		HVAC hvac = new HVACImpl(almostFreezing);
 		EnvironmentController environmentController = new EnvironmentController(hvac);
 		environmentController.tick();
-		boolean heatEnabled = getHeatEnabled(hvac);
-		boolean coldEnabled = getHeatEnabled(hvac);
-		boolean fanEnabled = getFanEnabled(hvac);
-		Assert.assertFalse(heatEnabled && coldEnabled && fanEnabled);
+		Assert.assertFalse(environmentController.getColdEnabled() && environmentController.getHeatEnabled() && environmentController.getFanEnabled());
 	}
 
+	@Test
+	public void disableHvacWhenAlmostTooHot() {
+		HVAC hvac = new HVACImpl(almostMelting);
+		EnvironmentController environmentController = new EnvironmentController(hvac);
+		environmentController.tick();
+		Assert.assertFalse(environmentController.getColdEnabled() && environmentController.getHeatEnabled() && environmentController.getFanEnabled());
+	}
 
-	private void setTemp(HVAC hvac, int temp) {
-		Field field;
+	private void replaceHvac(EnvironmentController environmentController, int temp) {
+		HVAC hvac = new HVACImpl(temp);
+		Field field = null;
 		try {
-			field = hvac.getClass().getDeclaredField("temperature");
-			field.set(hvac, temp);
-			} catch (NoSuchFieldException
+			field = environmentController.getClass().getDeclaredField("hvac");
+			field.set(environmentController, hvac);
+		} catch (NoSuchFieldException
 			  | IllegalAccessException e) {
 		e.printStackTrace();
 	  }
 	}
 
-	private boolean getFanEnabled(HVAC hvac) {
-		Field field = _getField(hvac, "fanEnabled");
-		return _getBoolean(hvac, field);
-	}
-
-	private boolean getHeatEnabled(HVAC hvac) {
-		Field field = _getField(hvac, "heatEnabled");
-		return _getBoolean(hvac, field);
-	}
-
-	private boolean getColdEnabled(HVAC hvac) {
-		Field field = _getField(hvac, "coldEnabled");
-		return _getBoolean(hvac, field);
-	}
-
-	private boolean _getBoolean(HVAC hvac, Field field) {
-		boolean boo = false; //so sorry
-		try {
-			boo =  (boolean)field.get(hvac);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		return boo;
-	}
-
-	private Field _getField(HVAC hvac, String fieldName) {
+	private void replaceHvac(EnvironmentController environmentController, HVAC hvac) {
 		Field field = null;
 		try {
-			field =  hvac.getClass().getDeclaredField(fieldName);
-			} catch (NoSuchFieldException e) {
+			field = environmentController.getClass().getDeclaredField("hvac");
+			field.set(environmentController, hvac);
+		} catch (NoSuchFieldException
+			  | IllegalAccessException e) {
 		e.printStackTrace();
 	  }
-	  return field;
 	}
 }

@@ -1,32 +1,26 @@
 /**
  * Created by lucas.schwarz on 6/14/16.
  */
-public class HVACImpl implements  HVAC {
+public class HVACImpl implements HVAC {
 
+	public HVACImpl (int temp) {
+		this.temperature = temp;
+	}
 
-
-	public int temperature;
-	public boolean heatEnabled = false;
-	public boolean coldEnabled = false;
-	public boolean fanEnabled = false;
-
-
-
+	private int temperature;
 	@Override
 	public void heat(boolean on) {
-		heatEnabled = on;
-		coldEnabled = !on;
+
 	}
 
 	@Override
 	public void cool(boolean on) {
-		coldEnabled = on;
-		heatEnabled = !on;
+
 	}
 
 	@Override
 	public void fan(boolean on) {
-		fanEnabled = on;
+
 	}
 
 	@Override
