@@ -85,22 +85,11 @@ public class HVACTests {
 		Assert.assertTrue(allThingsOff);
 	}
 
-	private void replaceHvac(EnvironmentController environmentController, int temp) {
-		HVAC hvac = new HVACImpl(temp);
-		Field field = null;
-		try {
-			field = environmentController.getClass().getDeclaredField("hvac");
-			field.set(environmentController, hvac);
-		} catch (NoSuchFieldException
-			  | IllegalAccessException e) {
-		e.printStackTrace();
-	  }
-	}
-
 	private void replaceHvac(EnvironmentController environmentController, HVAC hvac) {
 		Field field = null;
 		try {
 			field = environmentController.getClass().getDeclaredField("hvac");
+			field.setAccessible(true);
 			field.set(environmentController, hvac);
 		} catch (NoSuchFieldException
 			  | IllegalAccessException e) {

@@ -3,7 +3,7 @@
  */
 public class EnvironmentController {
 
-	public HVAC hvac;
+	private HVAC hvac;
 	private Integer ticksUntilFanIsReady = 0;
 	private Integer heatRefractoryPeriod = 5;
 	private Integer coldRefractoryPeriod = 3;
@@ -22,7 +22,7 @@ public class EnvironmentController {
 	private boolean coldEnabled = false;
 	private boolean fanEnabled = false;
 
-	public void setHeatEnabled(boolean heatEnabled) {
+	private void setHeatEnabled(boolean heatEnabled) {
 		if(this.heatEnabled && !heatEnabled) {
 			//toggle from on to off and set the cooldown
 			ticksUntilFanIsReady = heatRefractoryPeriod;
@@ -34,7 +34,7 @@ public class EnvironmentController {
 		return this.heatEnabled;
 	}
 
-	public void setColdEnabled(boolean coldEnabled) {
+	private void setColdEnabled(boolean coldEnabled) {
 		if(this.coldEnabled && !coldEnabled) {
 			//toggle from on to off and set the cooldown
 			ticksUntilFanIsReady = coldRefractoryPeriod;
@@ -46,7 +46,7 @@ public class EnvironmentController {
 		return this.coldEnabled;
 	}
 
-	public void setFanEnabled(boolean fanEnabled) {
+	private void setFanEnabled(boolean fanEnabled) {
 		if(!this.fanEnabled && fanEnabled) {
 			//toggle from off to on and check the cooldown
 			if(ticksUntilFanIsReady > 0) {
@@ -72,6 +72,7 @@ public class EnvironmentController {
 	public EnvironmentController(HVAC hvac) {
 		this.hvac = hvac;
 	}
+
 	public void tick() {
 		temp = hvac.temp();
 		if (temp < 65) {
