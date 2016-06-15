@@ -74,15 +74,16 @@ public class HVACTests {
 		HVAC hvac = new HVACImpl(almostFreezing);
 		EnvironmentController environmentController = new EnvironmentController(hvac);
 		environmentController.tick();
-		Assert.assertFalse(environmentController.getColdEnabled() && environmentController.getHeatEnabled() && environmentController.getFanEnabled());
-	}
+		boolean allThingsOff = !environmentController.getColdEnabled() && !environmentController.getFanEnabled() && !environmentController.getFanEnabled();
+		Assert.assertTrue(allThingsOff);	}
 
 	@Test
 	public void disableHvacWhenAlmostTooHot() {
 		HVAC hvac = new HVACImpl(almostMelting);
 		EnvironmentController environmentController = new EnvironmentController(hvac);
 		environmentController.tick();
-		Assert.assertFalse(environmentController.getColdEnabled() && environmentController.getHeatEnabled() && environmentController.getFanEnabled());
+		boolean allThingsOff = !environmentController.getColdEnabled() && !environmentController.getFanEnabled() && !environmentController.getFanEnabled();
+		Assert.assertTrue(allThingsOff);
 	}
 
 	private void replaceHvac(EnvironmentController environmentController, int temp) {
