@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.function.Function;
 
 /**
@@ -28,8 +29,12 @@ public class Main {
 		Function<String, String> dummyTranslator = in -> in + "hello world\n";
 		ServerSocketWrapper wrapper = new ServerSocketWrapper(dummyTranslator);
 				new Thread(() -> {
-				wrapper.start(9000);
-		}).start();
+					try {
+						wrapper.start(9000);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}).start();
 		System.out.println("works for me");
 //		wrapper.stop();
 		//get the value of a request

@@ -23,24 +23,28 @@ public class ServerSocketWrapperTest {
 	public void setUp() {
 		Function<String, String> dummyTranslator = in -> "";
 		wrapper = new ServerSocketWrapper(dummyTranslator);
+		startWrapper();
+
 	}
 
 	@After
 	public void tearDown() throws IOException {
+		nap(500);
 		wrapper.stop();
+		nap(500);
 	}
 
 
 	@Test
 	public void startServer() throws IOException, InterruptedException {
-		startWrapper();
+//		startWrapper();
 		Socket socket = new Socket(HOST, PORT);
 		Assert.assertTrue("We did not find your connection", socket.isConnected());
 	}
 
 	@Test (expected = ConnectException.class)
 	public void stopServer() throws IOException, InterruptedException {
-		startWrapper();
+//		startWrapper();
 		Thread.sleep(1);
 		wrapper.stop();
 		new Socket(HOST, PORT);
@@ -56,7 +60,7 @@ public class ServerSocketWrapperTest {
 		};
 		wrapper.setTranslator(translator);
 
-		startWrapper();
+//		startWrapper();
 		sendDataToSocket(testData);
 
 		int retries = 0;
@@ -69,7 +73,11 @@ public class ServerSocketWrapperTest {
 
 	private void startWrapper()  {
 		new Thread(() -> {
+			try {
 				wrapper.start(PORT);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}).start();
 	}
 

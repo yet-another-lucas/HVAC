@@ -14,46 +14,23 @@ public class ServerSocketWrapper {
 	BufferedReader in;
 	BufferedWriter out;
 
-	public ServerSocketWrapper(Function<String, String> dummyTranslator) {
-		this.translator = dummyTranslator;
-	}
+    public ServerSocketWrapper(Function<String, String> dummyTranslator) {
+        this.translator = dummyTranslator;
+    }
 
-	public void start(int port) {
-		try {
-			socketServer = new ServerSocket(port);
-			socket = socketServer.accept();
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-			String data = in.readLine();
-			processInput(data);
+    public void start(int port) throws IOException {
+        socketServer = new ServerSocket(port);
+        socket = socketServer.accept();
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        String data = in.readLine();
+        this.translator.apply(data);
+    }
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    public void stop() throws IOException {
+        socketServer.close();
+    }
 
-
-
-	public void stop() {
-		try {
-			socketServer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void setTranslator(Function<String, String> translator) {
-		this.translator = translator;
-	}
-
-	public String processInput(String data) {
-		String processedInput = this.translator.apply(data);
-		try {
-			out.write(processedInput);
-			out.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return processedInput;
-	}
+    public void setTranslator(Function<String, String> translator) {
+        this.translator = translator;
+    }
 }
