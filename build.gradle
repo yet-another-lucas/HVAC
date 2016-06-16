@@ -7,7 +7,7 @@ run {
     if ( project.hasProperty("hvacArgs") ) {
         args Eval.me(hvacArgs)
     }
-    else {args Eval.me("[0, 10]")}
+    else {args Eval.me("[0, 0]")}
 }
 
 

@@ -10,19 +10,23 @@ public class Main {
 		for (String arg : args) {
 			System.out.println("arg: " + arg);
 		}
-
-
-
+		
 		EnvironmentController environmentController = new EnvironmentController(new HvacRealImpl ());
+
+		//ugh parse the arbs
+		Integer lowerBound = 0;
+		Integer upperBound = 0;
 		if (args != null) {
 			if (args[0] != null) {
-				Integer upperBound = Integer.parseInt(args[0]);
-				environmentController.setUpperBound(upperBound);
+				upperBound = Integer.parseInt(args[0]);
 			}
 			if (args[0] != null) {
-				Integer lowerBound = Integer.parseInt(args[1]);
-				environmentController.setLowerBound(lowerBound);
+				lowerBound = Integer.parseInt(args[1]);
 			}
+		}
+		if (!upperBound.equals(lowerBound)) {
+			environmentController.setUpperBound(upperBound);
+			environmentController.setLowerBound(lowerBound);
 		}
 		System.out.println("upperBound: " + environmentController.getUpperBound());
 		System.out.println("lowerBound: " + environmentController.getLowerBound());
