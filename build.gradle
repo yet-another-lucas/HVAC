@@ -7,6 +7,7 @@ run {
     if ( project.hasProperty("hvacArgs") ) {
         args Eval.me(hvacArgs)
     }
+    else {args Eval.me("[0, 10]")}
 }
 
 // In this section you declare where to find the dependencies of your project
