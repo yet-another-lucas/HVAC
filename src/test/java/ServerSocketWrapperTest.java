@@ -1,4 +1,3 @@
-import com.sun.xml.internal.bind.v2.TODO;
 import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
@@ -15,65 +14,86 @@ import java.util.function.Function;
  */
 public class ServerSocketWrapperTest {
 
-    private final static int PORT = 8080;
-    private final static String HOST = "localHost";
-    private ServerSocketWrapper wrapper;
-
-    private void startWrapper() throws InterruptedException {
-        new Thread(() -> {
-            try {
-                wrapper.start(PORT);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }).start();
-    }
-
-    public void sendDataToSocket(String data) throws InterruptedException, IOException {
-        startWrapper();
-        Socket socket = new Socket(HOST, PORT);
-        PrintWriter out = new PrintWriter(socket.getOutputStream());
-        out.println(data);
-        out.flush();
-    }
-    @Before
-    public void setUp() {
-        Function<String, String> dummyTranslator = in -> "";
-        wrapper = new ServerSocketWrapper();
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        wrapper.stop();
-    }
+	private final static int PORT = 8080;
+	private final static String HOST = "localHost";
+	private ServerSocketWrapper wrapper;
 
 
-    @Test
-    public void startServer() throws IOException, InterruptedException {
-        startWrapper();
-        Socket socket = new Socket(HOST, PORT);
-        Assert.assertTrue("We did not find your connection", socket.isConnected());
-    }
+	@Before
+	public void setUp() {
+		Function<String, String> dummyTranslator = in -> "";
+		wrapper = new ServerSocketWrapper(dummyTranslator);
+	}
 
-    //Need to fix
-    
-//    @Test
-//    public void sendDataToSocket(){
-//        sendDataToSocket();
-//    }
+	@After
+	public void tearDown() throws IOException {
+		wrapper.stop();
+	}
 
 
-    @Test (expected = ConnectException.class)
-    public void stopServer() throws IOException, InterruptedException {
-        startWrapper();
-        Thread.sleep(1);
-        wrapper.stop();
-        Socket socket = new Socket(HOST, PORT);
+	@Test
+	public void startServer() throws IOException, InterruptedException {
+		startWrapper();
+		Socket socket = new Socket(HOST, PORT);
+		Assert.assertTrue("We did not find your connection", socket.isConnected());
+	}
 
+	@Test (expected = ConnectException.class)
+	public void stopServer() throws IOException, InterruptedException {
+		startWrapper();
+		Thread.sleep(1);
+		wrapper.stop();
+		new Socket(HOST, PORT);
+	}
+	
+	@Test
+	public void acceptDataFromSocket()  {
+		final String[] actualData = new String[1];
+		String testData = "data";
+		Function<String, String> translator = in -> {
+			actualData[0] = in;
+			return in;
+		};
+		wrapper.setTranslator(translator);
 
+		startWrapper();
+		sendDataToSocket(testData);
 
-    }
+		int retries = 0;
+		while(actualData[0] == null && retries < 5) {
+			nap(1);
+			retries++;
+		}
+		Assert.assertEquals(actualData[0], "data");
+	}
+
+	private void startWrapper()  {
+		new Thread(() -> {
+				wrapper.start(PORT);
+		}).start();
+	}
+
+	public void sendDataToSocket(String data) {
+		startWrapper();
+		Socket socket = null;
+		PrintWriter out = null;
+		try {
+			socket = new Socket(HOST, PORT);
+			out = new PrintWriter(socket.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		out.println(data);
+		out.flush();
+	}
+
+	public void nap(int sleepInMs) {
+		try {
+			Thread.sleep(sleepInMs);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 
 
