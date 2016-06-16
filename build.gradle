@@ -10,10 +10,16 @@ run {
     else {args Eval.me("[0, 10]")}
 }
 
+
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     mavenCentral()
 }
+
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 // In this section you declare the dependencies for your production and test code
 dependencies {

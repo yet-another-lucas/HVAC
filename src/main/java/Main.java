@@ -30,6 +30,7 @@ public class Main {
 				new Thread(() -> {
 				wrapper.start(9000);
 		}).start();
+		System.out.println("works for me");
 //		wrapper.stop();
 		//get the value of a request
 		//and try to apply it to the environment controller's upper and lower bounds
